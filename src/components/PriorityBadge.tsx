@@ -1,17 +1,19 @@
 import type { Priority } from '../types'
+import { useI18n } from '../contexts/I18nContext'
 
-const config: Record<Priority, { label: string; color: string; bg: string }> = {
-  basse: { label: 'Basse', color: 'text-priority-basse', bg: 'bg-priority-basse/20' },
-  moyenne: { label: 'Moyenne', color: 'text-priority-moyenne', bg: 'bg-priority-moyenne/20' },
-  haute: { label: 'Haute', color: 'text-priority-haute', bg: 'bg-priority-haute/20' },
+const config: Record<Priority, { key: 'low' | 'medium' | 'high'; color: string; bg: string }> = {
+  basse: { key: 'low', color: 'text-priority-basse', bg: 'bg-priority-basse/20' },
+  moyenne: { key: 'medium', color: 'text-priority-moyenne', bg: 'bg-priority-moyenne/20' },
+  haute: { key: 'high', color: 'text-priority-haute', bg: 'bg-priority-haute/20' },
 }
 
 export function PriorityBadge({ priority }: { priority: Priority }) {
+  const { t } = useI18n()
   const c = config[priority]
   return (
     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${c.bg} ${c.color}`}>
       <PriorityIcon priority={priority} />
-      {c.label}
+      {t(c.key)}
     </span>
   )
 }

@@ -1,17 +1,19 @@
 import type { InterventionStatus } from '../types'
+import { useI18n } from '../contexts/I18nContext'
 
-const config: Record<InterventionStatus, { label: string; bg: string; text: string }> = {
-  a_faire: { label: 'A faire', bg: 'bg-fanni-muted/20', text: 'text-fanni-muted' },
-  en_cours: { label: 'En cours', bg: 'bg-fanni-indigo/20', text: 'text-fanni-indigo' },
-  fait: { label: 'Fait', bg: 'bg-priority-basse/20', text: 'text-priority-basse' },
+const config: Record<InterventionStatus, { key: 'todo' | 'in_progress' | 'done'; bg: string; text: string }> = {
+  a_faire: { key: 'todo', bg: 'bg-status-a_faire/20', text: 'text-status-a_faire' },
+  en_cours: { key: 'in_progress', bg: 'bg-status-en_cours/20', text: 'text-status-en_cours' },
+  fait: { key: 'done', bg: 'bg-priority-basse/20', text: 'text-priority-basse' },
 }
 
 export function StatusBadge({ status }: { status: InterventionStatus }) {
+  const { t } = useI18n()
   const c = config[status]
   return (
     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${c.bg} ${c.text}`}>
       <StatusIcon status={status} />
-      {c.label}
+      {t(c.key)}
     </span>
   )
 }

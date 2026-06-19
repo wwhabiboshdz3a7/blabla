@@ -1,18 +1,6 @@
 import { db } from './db'
 import type { User, Client, Technician, Intervention } from '../types'
-
-import avatarNadia from '../assets/images/avatars/nadia.png'
-import avatarKarim from '../assets/images/avatars/karim.png'
-import avatarYacine from '../assets/images/avatars/yacine.png'
-
-import fibreAvant from '../assets/images/photos/fibre-appt-avant.jpg'
-import fibreApres from '../assets/images/photos/fibre-appt-apres.jpg'
-import armAvant from '../assets/images/photos/armoire-avant.jpg'
-import armApres from '../assets/images/photos/armoire-apres.jpg'
-import comAvant from '../assets/images/photos/commerce-avant.jpg'
-import comApres from '../assets/images/photos/commerce-apres.jpg'
-import modemAvant from '../assets/images/photos/modem-avant.jpg'
-import modemApres from '../assets/images/photos/modem-apres.jpg'
+import { avatarNadia, avatarKarim, avatarYacine, photos } from '../assets/images'
 
 const users: User[] = [
   { id: 'u1', name: 'Nadia', role: 'manager', avatar: avatarNadia, zone: 'Oran' },
@@ -33,12 +21,11 @@ const technicians: Technician[] = [
 ]
 
 const today = new Date()
-const fmt = (d: Date) => d.toISOString()
 const day = (offset: number) => {
   const d = new Date(today)
   d.setDate(d.getDate() + offset)
   d.setHours(9 + Math.floor(Math.random() * 6), 0, 0, 0)
-  return fmt(d)
+  return d.toISOString()
 }
 
 const interventions: Intervention[] = [
@@ -50,10 +37,10 @@ const interventions: Intervention[] = [
     technicianId: 't1',
     clientId: 'c1',
     location: '12 Rue Larbi Ben M\'hidi, Oran',
-    photosBefore: [fibreAvant],
-    photosAfter: [fibreApres],
+    photosBefore: [photos.fibreAvant],
+    photosAfter: [photos.fibreApres],
     report: 'Installation ONT et tirage fibre terminés. Test débit OK (100 Mbps). Client satisfait.',
-    signature: 'Benali_sig',
+    signature: '',
     scheduledAt: day(-1),
   },
   {
@@ -64,8 +51,8 @@ const interventions: Intervention[] = [
     technicianId: 't1',
     clientId: 'c2',
     location: '45 Bd Maata, Oran',
-    photosBefore: [armAvant],
-    photosAfter: [armApres],
+    photosBefore: [photos.armoireAvant],
+    photosAfter: [photos.armoireApres],
     report: '',
     signature: '',
     scheduledAt: day(0),
@@ -78,8 +65,8 @@ const interventions: Intervention[] = [
     technicianId: 't1',
     clientId: 'c2',
     location: '45 Bd Maata, Oran',
-    photosBefore: [comAvant],
-    photosAfter: [comApres],
+    photosBefore: [photos.commerceAvant],
+    photosAfter: [],
     report: '',
     signature: '',
     scheduledAt: day(1),
@@ -92,8 +79,8 @@ const interventions: Intervention[] = [
     technicianId: 't1',
     clientId: 'c3',
     location: '8 Rue des Frères Moulay, Oran',
-    photosBefore: [modemAvant],
-    photosAfter: [modemApres],
+    photosBefore: [photos.modemAvant],
+    photosAfter: [],
     report: '',
     signature: '',
     scheduledAt: day(2),
@@ -120,7 +107,7 @@ const interventions: Intervention[] = [
     technicianId: 't2',
     clientId: 'c3',
     location: '8 Rue des Frères Moulay, Oran',
-    photosBefore: [fibreAvant],
+    photosBefore: [photos.fibreAvant],
     photosAfter: [],
     report: '',
     signature: '',

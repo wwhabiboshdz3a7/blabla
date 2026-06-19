@@ -2,14 +2,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 @theme {
-  --color-fanni-bg: #0F0720;
-  --color-fanni-surface: #1A0E2E;
-  --color-fanni-card: #231545;
+  --color-d-bg: #0F0720;
+  --color-d-surface: #1A0E2E;
+  --color-d-card: #231545;
+  --color-d-text: #EDE9FE;
+  --color-d-muted: #A78BFA;
+  --color-d-border: #312E81;
+
+  --color-l-bg: #F5F3FF;
+  --color-l-surface: #FFFFFF;
+  --color-l-card: #FFFFFF;
+  --color-l-text: #1E1B4B;
+  --color-l-muted: #6D28D9;
+  --color-l-border: #DDD6FE;
+
   --color-fanni-violet: #7C3AED;
   --color-fanni-indigo: #6366F1;
-  --color-fanni-text: #EDE9FE;
-  --color-fanni-muted: #A78BFA;
-  --color-fanni-border: #312E81;
   --color-priority-basse: #10B981;
   --color-priority-moyenne: #F59E0B;
   --color-priority-haute: #EF4444;
@@ -19,32 +27,57 @@
   --font-sans: 'Space Grotesk', system-ui, sans-serif;
 }
 
+:root {
+  --bg: var(--color-d-bg);
+  --surface: var(--color-d-surface);
+  --card: var(--color-d-card);
+  --text: var(--color-d-text);
+  --muted: var(--color-d-muted);
+  --border: var(--color-d-border);
+}
+
+[data-theme="light"] {
+  --bg: var(--color-l-bg);
+  --surface: var(--color-l-surface);
+  --card: var(--color-l-card);
+  --text: var(--color-l-text);
+  --muted: var(--color-l-muted);
+  --border: var(--color-l-border);
+}
+
 * {
   scrollbar-width: thin;
-  scrollbar-color: #7C3AED #0F0720;
+  scrollbar-color: #7C3AED var(--bg);
 }
 
 body {
   font-family: 'Space Grotesk', system-ui, sans-serif;
-  background-color: #0F0720;
-  color: #EDE9FE;
+  background-color: var(--bg);
+  color: var(--text);
   min-height: 100dvh;
 }
+
+.th-bg { background-color: var(--bg); }
+.th-surface { background-color: var(--surface); }
+.th-card { background-color: var(--card); }
+.th-text { color: var(--text); }
+.th-muted { color: var(--muted); }
+.th-border { border-color: var(--border); }
+.th-card-hover:hover { border-color: color-mix(in srgb, #7C3AED 50%, transparent); }
 
 @keyframes count-up {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-.animate-count-up {
-  animation: count-up 0.6s ease-out forwards;
-}
+.animate-count-up { animation: count-up 0.6s ease-out forwards; }
 
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
+.animate-fade-in { animation: fade-in 0.4s ease-out forwards; }
 
-.animate-fade-in {
-  animation: fade-in 0.4s ease-out forwards;
-}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+[dir="rtl"] .rtl-flip { transform: scaleX(-1); }
