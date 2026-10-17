@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ocula.js</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Ocula, moteur d'animation JavaScript fictif : un télescope 3D qui se déploie et se pilote au scroll, propulsé par anime.js v4.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@300;500;700&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<a class="skip" href="#contenu">Aller au contenu</a>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="#top" aria-label="Ocula, retour en haut">
+      <span class="logo-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="logo-word">ocula</span>
+      <span class="logo-ver">v2.4</span>
+    </a>
+    <nav class="nav-links" aria-label="Principale">
+      <a href="#fonctions">Fonctions</a>
+      <a href="#atelier">Atelier</a>
+      <a href="#fiche">Fiche technique</a>
+    </nav>
+    <a class="nav-cta" href="#demarrer">Installer</a>
+  </div>
+</header>
+
+<main id="contenu">
+
+  <!-- 1. Le télescope : section épinglée pilotée par le scroll -->
+  <section class="story" id="top" aria-label="Présentation">
+    <div class="story-pin">
+      <canvas class="sky" aria-hidden="true"></canvas>
+
+      <div class="stage" aria-hidden="true">
+        <div class="pos">
+          <div class="dolly">
+            <div class="fit">
+              <div class="bob">
+                <div class="tilt">
+                  <div class="orient">
+                    <div class="intro" id="scope"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="crosshair" aria-hidden="true">
+        <span class="ch-ring"></span>
+        <span class="ch-h"></span>
+        <span class="ch-v"></span>
+      </div>
+
+      <div class="hero">
+        <p class="eyebrow">Moteur d'animation JavaScript · v2.4.0</p>
+        <h1 class="hero-title">Animez tout, de près comme de loin.</h1>
+        <p class="hero-lede">Ocula pilote CSS, SVG, attributs DOM et objets JavaScript avec une seule API. Timelines, ressorts, texte et scroll, le tout dans 9,8&nbsp;ko.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#fonctions">Découvrir</a>
+          <button class="copy" type="button" data-copy="npm install ocula">
+            <span class="copy-prompt" aria-hidden="true">$</span>
+            <span class="copy-text">npm install ocula</span>
+            <span class="copy-state">Copier</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="hud" aria-hidden="true">
+        <div class="hud-top">
+          <span class="hud-index">01</span>
+          <span class="hud-label">Déployer</span>
+        </div>
+        <p class="hud-caption">Six tubes glissent l'un hors de l'autre, chacun sur son propre ressort.</p>
+        <div class="hud-gauge">
+          <span class="hud-ticks"></span>
+          <span class="hud-needle"></span>
+        </div>
+        <dl class="hud-read">
+          <div><dt>Mise au point</dt><dd><span class="hud-p">0</span>&nbsp;%</dd></div>
+          <div><dt>Grossissement</dt><dd>×<span class="hud-m">12</span></dd></div>
+        </dl>
+      </div>
+
+      <p class="scroll-hint" aria-hidden="true"><span class="scroll-dot"></span>Faites défiler pour la mise au point</p>
+
+      <div class="reveal">
+        <canvas class="deep" aria-hidden="true"></canvas>
+        <span class="reveal-ring" aria-hidden="true"></span>
+        <div class="reveal-inner">
+          <p class="eyebrow">Ce que l'oculaire révèle</p>
+          <p class="reveal-title">Chaque image, nette. Chaque image, à l'heure.</p>
+          <p class="reveal-lede">Un seul moteur cadence vos animations sur l'horloge de l'écran, du premier pixel jusqu'à l'infini.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Fonctions -->
+  <section class="features" id="fonctions">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="eyebrow">Fonctions</p>
+        <h2 class="split">Six instruments, une seule API.</h2>
+        <p class="section-lede">Chaque fonction s'importe seule. Les démos ci-dessous tournent en direct&nbsp;: touchez-les.</p>
+      </header>
+
+      <div class="grid">
+        <article class="card" style="--accent: var(--c1)">
+          <div class="demo demo-animate" aria-hidden="true">
+            <span class="track"></span>
+            <span class="shape shape-a"></span>
+            <span class="shape shape-b"></span>
+            <span class="shape shape-c"></span>
+          </div>
+          <div class="card-body">
+            <code class="api">animate()</code>
+            <h3>Toutes les propriétés</h3>
+            <p>Transformations, couleurs, rayons, variables CSS et attributs SVG, interpolés au sous-pixel près.</p>
+          </div>
+        </article>
+
+        <article class="card" style="--accent: var(--c2)">
+          <div class="demo demo-stagger" data-hint="Touchez un point">
+            <div class="dots" role="presentation"></div>
+          </div>
+          <div class="card-body">
+            <code class="api">stagger()</code>
+            <h3>Décalages en grille</h3>
+            <p>Une onde part du point touché et se propage selon la distance, en ligne, en grille ou au hasard.</p>
+          </div>
+        </article>
+
+        <article class="card" style="--accent: var(--c3)">
+          <div class="demo demo-eclipse" aria-hidden="true">
+            <span class="sun"></span>
+            <span class="corona"></span>
+            <span class="moon"></span>
+            <span class="eclipse-label">Totalité · 2&nbsp;min&nbsp;41&nbsp;s</span>
+            <span class="eclipse-bar"><i></i></span>
+          </div>
+          <div class="card-body">
+            <code class="api">createTimeline()</code>
+            <h3>Séquences synchronisées</h3>
+            <p>Enchaînez, chevauchez et bouclez des animations sur une seule ligne de temps, comme une éclipse.</p>
+          </div>
+        </article>
+
+        <article class="card" style="--accent: var(--c4)">
+          <div class="demo demo-spring" data-hint="Attrapez la lentille">
+            <span class="trail"></span>
+            <span class="trail"></span>
+            <span class="trail"></span>
+            <button class="lens" type="button" aria-label="Lentille à faire glisser"></button>
+          </div>
+          <div class="card-body">
+            <code class="api">spring()</code>
+            <h3>Ressorts physiques</h3>
+            <p>Masse, raideur, amortissement. Lâchez la lentille&nbsp;: elle revient au centre avec du rebond.</p>
+          </div>
+        </article>
+
+        <article class="card" style="--accent: var(--c5)">
+          <div class="demo demo-svg" aria-hidden="true">
+            <svg viewBox="0 0 300 170" class="constellation">
+              <path class="c-line" d="M30 62 L96 112 L150 58 L208 108 L270 40"></path>
+              <g class="c-stars">
+                <circle cx="30" cy="62" r="4"></circle>
+                <circle cx="96" cy="112" r="5"></circle>
+                <circle cx="150" cy="58" r="5.5"></circle>
+                <circle cx="208" cy="108" r="4.5"></circle>
+                <circle cx="270" cy="40" r="4"></circle>
+              </g>
+              <g class="c-names">
+                <text x="30" y="44">Caph</text>
+                <text x="96" y="140">Schedar</text>
+                <text x="150" y="40">Navi</text>
+                <text x="208" y="136">Ruchbah</text>
+                <text x="270" y="22">Ségin</text>
+              </g>
+            </svg>
+          </div>
+          <div class="card-body">
+            <code class="api">svg.createDrawable()</code>
+            <h3>Tracés SVG</h3>
+            <p>Dessinez n'importe quel chemin, puis faites suivre un objet le long de sa courbe. Ici, Cassiopée.</p>
+          </div>
+        </article>
+
+        <article class="card" style="--accent: var(--c6)">
+          <div class="demo demo-text" aria-hidden="true">
+            <span class="star-name">Sirius</span>
+            <span class="star-mag">magnitude <b class="star-mag-v">−1,46</b></span>
+          </div>
+          <div class="card-body">
+            <code class="api">scrambleText()</code>
+            <h3>Texte brouillé</h3>
+            <p>Chaque lettre défile au hasard avant de se poser. Les titres de la page, eux, sont découpés avec <code>splitText()</code>.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Atelier : timeline pilotable -->
+  <section class="lab" id="atelier">
+    <div class="wrap lab-grid">
+      <header class="section-head lab-head">
+        <p class="eyebrow">Atelier</p>
+        <h2 class="split">Une timeline, au centième de seconde.</h2>
+        <p class="section-lede">Lecture, pause, retour arrière, vitesse et défilement manuel. Toute la séquence tient dans une seule timeline que vous pouvez scruter image par image.</p>
+      </header>
+
+      <div class="lab-panel">
+        <div class="lab-view" aria-hidden="true">
+          <svg viewBox="0 0 520 300" class="orrery">
+            <g transform="translate(260 150)">
+              <g class="orbits">
+                <path class="orbit" id="orbit-1" d="M -92 0 A 92 34 0 1 0 92 0 A 92 34 0 1 0 -92 0"></path>
+                <path class="orbit" id="orbit-2" d="M -158 0 A 158 58 0 1 0 158 0 A 158 58 0 1 0 -158 0"></path>
+                <path class="orbit" id="orbit-3" d="M -228 0 A 228 84 0 1 0 228 0 A 228 84 0 1 0 -228 0"></path>
+              </g>
+              <circle class="planet-glow" r="46"></circle>
+              <circle class="planet" r="30"></circle>
+              <circle class="moon-dot m1" r="7"></circle>
+              <circle class="moon-dot m2" r="9"></circle>
+              <circle class="moon-dot m3" r="6"></circle>
+            </g>
+            <g class="orrery-labels">
+              <text x="16" y="28">Io · 1,77 j</text>
+              <text x="16" y="48">Europe · 3,55 j</text>
+              <text x="16" y="68">Ganymède · 7,15 j</text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="lab-controls">
+          <button class="ctl ctl-play" type="button" id="lab-play" aria-label="Pause">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path class="ico-pause" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"></path><path class="ico-play" d="M8 5l11 7-11 7z"></path></svg>
+          </button>
+          <button class="ctl" type="button" id="lab-restart" aria-label="Recommencer">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5a7 7 0 1 1-6.6 4.7l1.9.6A5 5 0 1 0 12 7v3L7.5 6 12 2z"></path></svg>
+          </button>
+          <button class="ctl" type="button" id="lab-reverse" aria-label="Inverser le sens">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l7-6v4h9v4h-9v4z"></path></svg>
+          </button>
+          <label class="scrub" for="lab-scrub">
+            <span class="sr">Position dans la timeline</span>
+            <input type="range" id="lab-scrub" min="0" max="1000" value="0" step="1">
+          </label>
+          <output class="lab-time" id="lab-time" for="lab-scrub">0,00 s</output>
+          <div class="speeds" role="group" aria-label="Vitesse">
+            <button type="button" class="speed" data-speed="0.5">0,5×</button>
+            <button type="button" class="speed is-on" data-speed="1">1×</button>
+            <button type="button" class="speed" data-speed="2">2×</button>
+          </div>
+        </div>
+
+        <div class="lab-code">
+<pre><code><span class="k">import</span> { createTimeline, svg, stagger } <span class="k">from</span> <span class="s">'ocula'</span>;
+
+<span class="k">const</span> tl = <span class="f">createTimeline</span>({ loop: <span class="n">true</span> })
+  .<span class="f">add</span>(<span class="s">'.planet'</span>, { scale: [<span class="n">0</span>, <span class="n">1</span>], ease: <span class="s">'outElastic(1, .6)'</span> })
+  .<span class="f">add</span>(svg.<span class="f">createDrawable</span>(<span class="s">'.orbit'</span>), {
+    draw: [<span class="s">'0 0'</span>, <span class="s">'0 1'</span>], delay: <span class="f">stagger</span>(<span class="n">160</span>)
+  }, <span class="s">'-=400'</span>)
+  .<span class="f">add</span>(<span class="s">'.m1'</span>, { ...svg.<span class="f">createMotionPath</span>(<span class="s">'#orbit-1'</span>), loop: <span class="n">3</span> }, <span class="s">'lunes'</span>)
+  .<span class="f">add</span>(<span class="s">'.m2'</span>, { ...svg.<span class="f">createMotionPath</span>(<span class="s">'#orbit-2'</span>), loop: <span class="n">1</span> }, <span class="s">'lunes'</span>)
+  .<span class="f">add</span>(<span class="s">'.m3'</span>, { ...svg.<span class="f">createMotionPath</span>(<span class="s">'#orbit-3'</span>) }, <span class="s">'lunes'</span>);</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Fiche technique -->
+  <section class="spec" id="fiche">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="eyebrow">Fiche technique</p>
+        <h2 class="split">Les chiffres de l'instrument.</h2>
+      </header>
+
+      <div class="focus-scale" aria-hidden="true">
+        <div class="fs-ticks"></div>
+        <div class="fs-nums">
+          <span>∞</span><span>30</span><span>10</span><span>5</span><span>3</span><span>2</span><span>1,5</span><span>1&nbsp;m</span>
+        </div>
+      </div>
+
+      <dl class="plate">
+        <div class="plate-row">
+          <dt>Ouverture <small>poids minifié + gzip</small></dt>
+          <dd><span class="count" data-to="9.8" data-dec="1">9,8</span>&nbsp;ko</dd>
+        </div>
+        <div class="plate-row">
+          <dt>Cadence <small>synchronisée à l'écran</small></dt>
+          <dd>jusqu'à <span class="count" data-to="120">120</span>&nbsp;i/s</dd>
+        </div>
+        <div class="plate-row">
+          <dt>Dépendances</dt>
+          <dd><span class="count" data-to="0">0</span></dd>
+        </div>
+        <div class="plate-row">
+          <dt>Modules <small>importables séparément</small></dt>
+          <dd><span class="count" data-to="14">14</span></dd>
+        </div>
+        <div class="plate-row">
+          <dt>Navigateurs</dt>
+          <dd>Chrome, Edge, Firefox, Safari</dd>
+        </div>
+        <div class="plate-row">
+          <dt>Licence</dt>
+          <dd>MIT</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="marquee" aria-label="Studios qui utilisent Ocula">
+      <div class="marquee-track">
+        <span>Atelier Zénith</span><span>Studio Périgée</span><span>Maison Orbe</span><span>Nadir&nbsp;&amp;&nbsp;Fils</span><span>Parallaxe</span><span>Halo Graphique</span><span>Équinoxe Labs</span><span>Cinq Lunes</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Démarrer -->
+  <section class="start" id="demarrer">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="eyebrow">Démarrer</p>
+        <h2 class="split">Prêt à regarder plus loin&nbsp;?</h2>
+      </header>
+      <ol class="steps">
+        <li class="step">
+          <span class="step-n">1</span>
+          <h3>Installer</h3>
+          <button class="copy copy-block" type="button" data-copy="npm install ocula">
+            <span class="copy-text">npm install ocula</span>
+            <span class="copy-state">Copier</span>
+          </button>
+        </li>
+        <li class="step">
+          <span class="step-n">2</span>
+          <h3>Importer</h3>
+          <button class="copy copy-block" type="button" data-copy="import { animate } from 'ocula';">
+            <span class="copy-text">import { animate } from 'ocula';</span>
+            <span class="copy-state">Copier</span>
+          </button>
+        </li>
+        <li class="step">
+          <span class="step-n">3</span>
+          <h3>Animer</h3>
+          <button class="copy copy-block" type="button" data-copy="animate('.lune', { x: 240, rotate: '1turn' });">
+            <span class="copy-text">animate('.lune', { x: 240, rotate: '1turn' });</span>
+            <span class="copy-state">Copier</span>
+          </button>
+        </li>
+      </ol>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p class="wordmark" aria-label="ocula">ocula</p>
+    <div class="foot-row">
+      <p class="foot-note">Ocula est un projet fictif imaginé pour cette démonstration. Toutes les animations de la page tournent avec <a href="https://animejs.com" target="_blank" rel="noopener">anime.js</a> v4.5 (licence MIT).</p>
+      <nav class="foot-links" aria-label="Pied de page">
+        <a href="#fonctions">Fonctions</a>
+        <a href="#atelier">Atelier</a>
+        <a href="#fiche">Fiche technique</a>
+        <a href="#top">Haut de page</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/vendor/anime.umd.min.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
