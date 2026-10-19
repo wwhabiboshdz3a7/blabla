@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vigie PC</title>
+<meta name="description" content="Surveille ton ordinateur à distance et reçois des notifications sur ton téléphone.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0F172A">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vigie">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F5F9;--panel:#FFFFFF;--panel2:#F7F9FC;--ink:#0E1726;--body:#3A4457;--muted:#6B7688;--line:#E4E9F1;
+  --accent:#0E9F6E;--accent-ink:#FFFFFF;--accent-soft:#DCF5EB;
+  --ok:#0E9F6E;--ok-soft:#DCF5EB;--warn:#B4690E;--warn-soft:#FBEFDC;--danger:#C2341D;--danger-soft:#FBE4DF;
+  --info:#2456C7;--info-soft:#E4ECFC;
+  --shadow:0 1px 2px rgba(14,23,38,.05),0 8px 24px rgba(14,23,38,.06);--r:16px
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0B1220;--panel:#121B2C;--panel2:#16213449;--ink:#EFF3F9;--body:#C3CCDA;--muted:#8793A6;--line:#223049;
+  --accent:#34D399;--accent-ink:#06210F;--accent-soft:#123024;
+  --ok:#34D399;--ok-soft:#123024;--warn:#F2B35A;--warn-soft:#33260F;--danger:#FF8A75;--danger-soft:#3A1A17;
+  --info:#8FB0FF;--info-soft:#17233D;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35)}}
+:root[data-theme="dark"]{
+  --bg:#0B1220;--panel:#121B2C;--panel2:#16213449;--ink:#EFF3F9;--body:#C3CCDA;--muted:#8793A6;--line:#223049;
+  --accent:#34D399;--accent-ink:#06210F;--accent-soft:#123024;
+  --ok:#34D399;--ok-soft:#123024;--warn:#F2B35A;--warn-soft:#33260F;--danger:#FF8A75;--danger-soft:#3A1A17;
+  --info:#8FB0FF;--info-soft:#17233D;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35)}
+*{box-sizing:border-box}html,body{margin:0}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--body);font:15.5px/1.5 "DM Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;padding-bottom:env(safe-area-inset-bottom)}
+button,input,select{font:inherit;color:inherit}
+h1,h2,h3{color:var(--ink);margin:0}
+.wrap{max-width:860px;margin:0 auto;padding:16px 16px 60px}
+header{display:flex;align-items:center;gap:12px;padding:14px 0 8px;position:sticky;top:0;background:linear-gradient(var(--bg) 70%,transparent);z-index:5}
+.logo{width:38px;height:38px;border-radius:11px;flex:0 0 auto;box-shadow:var(--shadow)}
+.brand{display:flex;flex-direction:column;line-height:1.15}
+.brand b{color:var(--ink);font-weight:700;font-size:18px}
+.brand small{color:var(--muted);font-size:12.5px}
+.spacer{flex:1}
+.iconbtn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--panel);
+  display:grid;place-items:center;cursor:pointer;color:var(--body);box-shadow:var(--shadow)}
+.iconbtn:active{transform:scale(.96)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);
+  padding:16px;margin:12px 0}
+.card h2{font-size:15px;letter-spacing:.2px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.row{display:flex;align-items:center;gap:10px}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:12px;
+  padding:11px 14px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.btn.ghost{background:transparent}
+.btn.sm{padding:8px 11px;border-radius:10px;font-size:13.5px;font-weight:600}
+.btn[disabled]{opacity:.5;cursor:default}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:600}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.off{background:var(--danger-soft);color:var(--danger)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.info{background:var(--info-soft);color:var(--info)}
+.dot{width:8px;height:8px;border-radius:50%;background:currentColor;display:inline-block}
+.muted{color:var(--muted)}
+.hostgrid{display:grid;gap:12px}
+.hosthead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.hosthead b{color:var(--ink);font-size:16.5px;font-weight:700}
+.gauges{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:12px;margin-top:14px}
+.gauge{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.gauge .ring{position:relative;width:84px;height:84px;margin:0 auto 6px}
+.gauge .ring svg{transform:rotate(-90deg)}
+.gauge .val{position:absolute;inset:0;display:grid;place-items:center;font-weight:700;color:var(--ink);font-size:17px}
+.gauge .lbl{font-size:12.5px;color:var(--muted);font-weight:600}
+.gauge .sub{font-size:11.5px;color:var(--muted);margin-top:1px}
+.spark{display:block;width:100%;height:30px;margin-top:8px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13.5px;margin-top:12px}
+.kv div:nth-child(odd){color:var(--muted)}
+.kv div:nth-child(even){color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{font-size:12.5px;border-radius:999px;padding:4px 10px;border:1px solid var(--line);background:var(--panel2);
+  display:inline-flex;gap:6px;align-items:center}
+.chip.up{color:var(--ok)}.chip.down{color:var(--danger)}
+.cmds{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.alert{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.alert:first-child{border-top:0}
+.alert .bar{width:4px;border-radius:4px;flex:0 0 auto;background:var(--info)}
+.alert.warn .bar{background:var(--warn)}.alert.critical .bar{background:var(--danger)}.alert.info .bar{background:var(--info)}
+.alert .at{color:var(--muted);font-size:12px;white-space:nowrap}
+.alert b{color:var(--ink);font-weight:600;font-size:14px}
+.alert p{margin:2px 0 0;font-size:13px}
+details>summary{cursor:pointer;color:var(--muted);font-size:13px;margin-top:10px;list-style:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸ ";}
+details[open]>summary::before{content:"▾ ";}
+.proc{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;font-variant-numeric:tabular-nums}
+.proc span:last-child{color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:26px 10px}
+.sheet{position:fixed;inset:0;background:rgba(6,10,20,.5);display:none;align-items:flex-end;z-index:30}
+.sheet.show{display:flex}
+.sheet .inner{background:var(--panel);border-radius:18px 18px 0 0;width:100%;max-width:860px;margin:0 auto;
+  padding:18px 18px calc(22px + env(safe-area-inset-bottom));border:1px solid var(--line)}
+.field{margin:12px 0}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px;font-weight:600}
+.field input,.field select{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:var(--panel2)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);
+  background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:600;font-size:13.5px;
+  box-shadow:var(--shadow);opacity:0;transition:opacity .2s, transform .2s;z-index:50;pointer-events:none;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.banner{background:var(--warn-soft);color:var(--warn);border:1px solid var(--line);border-radius:12px;
+  padding:10px 12px;font-size:13.5px;margin:10px 0}
+@media (max-width:420px){.gauges{grid-template-columns:repeat(3,1fr)}.gauge{padding:9px}.gauge .ring{width:70px;height:70px}.gauge .val{font-size:15px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img class="logo" src="/icons/icon-192.png" alt="">
+    <div class="brand"><b>Vigie PC</b><small id="subtitle">Connexion…</small></div>
+    <div class="spacer"></div>
+    <button class="iconbtn" id="refreshBtn" title="Rafraîchir" aria-label="Rafraîchir">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/></svg>
+    </button>
+    <button class="iconbtn" id="settingsBtn" title="Réglages" aria-label="Réglages">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.2.63.78 1.05 1.44 1.05H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </header>
+
+  <div id="codeBanner" class="banner" hidden></div>
+
+  <section class="card" id="notifCard">
+    <h2>🔔 Notifications sur ce téléphone</h2>
+    <p class="muted" id="notifState" style="margin:0 0 12px">Reçois une alerte quand ton ordinateur a un souci, s'éteint ou revient en ligne.</p>
+    <div class="row" style="flex-wrap:wrap">
+      <button class="btn primary" id="notifBtn">Activer les notifications</button>
+      <button class="btn ghost sm" id="testBtn" hidden>Tester</button>
+    </div>
+  </section>
+
+  <section class="card" id="alertsCard">
+    <h2>📼 Dernières alertes <span class="spacer" style="flex:1"></span>
+      <button class="btn ghost sm" id="clearAlerts">Effacer</button></h2>
+    <div id="alerts"><div class="empty">Aucune alerte pour l'instant.</div></div>
+  </section>
+
+  <div id="hosts" class="hostgrid"></div>
+  <div id="hostsEmpty" class="empty" hidden>
+    Aucun ordinateur ne s'est encore annoncé.<br>Lance l'agent sur ton ordinateur (dossier <code>agent/</code>) — voir le README.
+  </div>
+
+  <p class="muted" style="text-align:center;font-size:12px;margin-top:22px">Vigie PC · mise à jour <span id="lastUpd">—</span></p>
+</div>
+
+<!-- Réglages -->
+<div class="sheet" id="sheet">
+  <div class="inner">
+    <div class="row"><h2 style="font-size:17px">Réglages</h2><div class="spacer" style="flex:1"></div>
+      <button class="btn ghost sm" id="closeSheet">Fermer</button></div>
+    <div class="field">
+      <label>Code d'accès (si configuré sur le site)</label>
+      <input id="codeInput" type="password" autocomplete="off" placeholder="laisser vide si aucun">
+    </div>
+    <div class="field">
+      <label>Thème</label>
+      <select id="themeSel">
+        <option value="auto">Automatique (système)</option>
+        <option value="dark">Sombre</option>
+        <option value="light">Clair</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Rafraîchissement automatique</label>
+      <select id="pollSel">
+        <option value="5000">Toutes les 5 s</option>
+        <option value="10000" selected>Toutes les 10 s</option>
+        <option value="30000">Toutes les 30 s</option>
+        <option value="0">Manuel seulement</option>
+      </select>
+    </div>
+    <div class="row" style="margin-top:8px;flex-wrap:wrap">
+      <button class="btn" id="saveSettings">Enregistrer</button>
+      <button class="btn ghost sm" id="unsubBtn">Désactiver les notifications</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const LS = { code:"vigie_code", theme:"vigie_theme", poll:"vigie_poll" };
+
+const store = {
+  get code(){ try{return localStorage.getItem(LS.code)||""}catch{return ""} },
+  set code(v){ try{localStorage.setItem(LS.code,v)}catch{} },
+  get theme(){ try{return localStorage.getItem(LS.theme)||"auto"}catch{return "auto"} },
+  set theme(v){ try{localStorage.setItem(LS.theme,v)}catch{} },
+  get poll(){ try{return localStorage.getItem(LS.poll)||"10000"}catch{return "10000"} },
+  set poll(v){ try{localStorage.setItem(LS.poll,v)}catch{} },
+};
+
+/* ---------- Thème ---------- */
+function applyTheme(){
+  const t = store.theme;
+  const root = document.documentElement;
+  if(t==="auto") root.removeAttribute("data-theme"); else root.setAttribute("data-theme", t);
+}
+applyTheme();
+
+/* ---------- Appels API ---------- */
+async function api(path, opts={}){
+  const headers = Object.assign({}, opts.headers||{});
+  if(store.code) headers["X-Vigie-Code"] = store.code;
+  if(opts.body){ headers["Content-Type"]="application/json"; opts.body = JSON.stringify(opts.body); }
+  const r = await fetch(path, Object.assign({}, opts, {headers}));
+  let data = {}; try{ data = await r.json(); }catch{}
+  if(r.status===401){ $("#codeBanner").hidden=false; $("#codeBanner").textContent="Code d'accès requis ou incorrect — ouvre les Réglages pour le saisir."; }
+  return {data, status:r.status};
+}
+
+/* ---------- Utilitaires d'affichage ---------- */
+function fmtBytes(b){ if(b==null) return "—"; const u=["o","Ko","Mo","Go","To"]; let i=0,n=b; while(n>=1024&&i<u.length-1){n/=1024;i++;} return (n>=100||i===0?Math.round(n):n.toFixed(1))+" "+u[i]; }
+function fmtPct(v){ return v==null?"—":Math.round(v)+" %"; }
+function fmtDur(s){ if(s==null) return "—"; const d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);
+  if(d>0) return `${d} j ${h} h`; if(h>0) return `${h} h ${m} min`; return `${m} min`; }
+function since(ts){ if(!ts) return "—"; const s=Math.max(0,Math.floor((Date.now()-ts)/1000));
+  if(s<60) return "il y a "+s+" s"; const m=Math.floor(s/60); if(m<60) return "il y a "+m+" min";
+  const h=Math.floor(m/60); if(h<24) return "il y a "+h+" h"; return "il y a "+Math.floor(h/24)+" j"; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+function gaugeColor(v, lowGood=true){
+  if(v==null) return "var(--muted)";
+  if(lowGood) return v>=90?"var(--danger)":v>=75?"var(--warn)":"var(--ok)";
+  return v<=15?"var(--danger)":v<=30?"var(--warn)":"var(--ok)";
+}
+
+function ringSVG(v, color){
+  const r=34, c=2*Math.PI*r, pct=Math.max(0,Math.min(100,v==null?0:v)), off=c*(1-pct/100);
+  return `<svg width="84" height="84" viewBox="0 0 84 84">
+    <circle cx="42" cy="42" r="${r}" fill="none" stroke="var(--line)" stroke-width="9"/>
+    <circle cx="42" cy="42" r="${r}" fill="none" stroke="${color}" stroke-width="9" stroke-linecap="round"
+      stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/></svg>`;
+}
+
+function sparkSVG(hist, field, color){
+  const pts = hist.map(h=>h[field]).filter(v=>v!=null);
+  if(pts.length<2) return "";
+  const w=260,h=30,n=pts.length, max=100, min=0;
+  const xs=i=>i/(n-1)*w, ys=v=>h-2-(v-min)/(max-min)*(h-4);
+  let d=`M ${xs(0).toFixed(1)} ${ys(pts[0]).toFixed(1)}`;
+  for(let i=1;i<n;i++) d+=` L ${xs(i).toFixed(1)} ${ys(pts[i]).toFixed(1)}`;
+  const area=d+` L ${w} ${h} L 0 ${h} Z`;
+  const id="g"+field+Math.random().toString(36).slice(2,6);
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${color}" stop-opacity="0.25"/><stop offset="1" stop-color="${color}" stop-opacity="0"/>
+    </linearGradient></defs>
+    <path d="${area}" fill="url(#${id})"/><path d="${d}" fill="none" stroke="${color}" stroke-width="1.6"/></svg>`;
+}
+
+/* ---------- Rendu ---------- */
+let LAST = {hosts:[], alerts:[]};
+
+function render(payload){
+  LAST = payload;
+  const hosts = payload.hosts||[], alerts = payload.alerts||[];
+  const online = hosts.filter(h=>h.online).length;
+  $("#subtitle").textContent = hosts.length ? `${online}/${hosts.length} en ligne` : "Aucun ordinateur";
+  $("#lastUpd").textContent = new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+
+  // Alertes
+  const ac = $("#alerts");
+  if(!alerts.length){ ac.innerHTML = `<div class="empty">Aucune alerte pour l'instant.</div>`; }
+  else ac.innerHTML = alerts.map(a=>`
+    <div class="alert ${esc(a.level)}"><div class="bar"></div>
+      <div style="flex:1"><div class="row" style="gap:8px"><b style="flex:1">${esc(a.title)}</b>
+      <span class="at">${since(a.t)}</span></div>${a.message?`<p>${esc(a.message)}</p>`:""}</div></div>`).join("");
+
+  // Ordinateurs
+  const hc = $("#hosts");
+  $("#hostsEmpty").hidden = hosts.length>0;
+  hc.innerHTML = hosts.map(renderHost).join("");
+  $$(".cmdbtn").forEach(b=>b.addEventListener("click", onCommand));
+}
+
+function renderHost(h){
+  const s = h.snapshot||{};
+  const off = !h.online;
+  const badge = off ? `<span class="pill off"><span class="dot"></span>hors ligne</span>`
+                    : `<span class="pill ok"><span class="dot"></span>en ligne</span>`;
+  const g = (lbl,val,sub,lowGood=true)=>{
+    const col = gaugeColor(val,lowGood);
+    return `<div class="gauge"><div class="ring">${ringSVG(val,col)}<div class="val">${fmtPct(val)}</div></div>
+      <div class="lbl">${lbl}</div><div class="sub">${sub||""}</div></div>`;
+  };
+  const batt = s.battery_pct;
+  const battSub = batt==null?"":(s.battery_charging?"en charge ⚡":"sur batterie");
+  const gauges = [
+    g("Processeur", s.cpu_pct, s.cpu_count?`${s.cpu_count} cœurs`:""),
+    g("Mémoire", s.ram_pct, (s.ram_used!=null?fmtBytes(s.ram_used)+" / "+fmtBytes(s.ram_total):"")),
+    g("Disque", s.disk_pct, (s.disk_used!=null?fmtBytes(s.disk_total-s.disk_used)+" libres":"")),
+  ];
+  if(batt!=null) gauges.push(g("Batterie", batt, battSub, false));
+
+  const spark = h.history && h.history.length>2 ? sparkSVG(h.history,"cpu","var(--accent)") : "";
+
+  const watched = (s.watched||[]).map(w=>`<span class="chip ${w.up?"up":"down"}">${w.up?"🟢":"🔴"} ${esc(w.name)}</span>`).join("");
+  const topcpu = (s.top_cpu||[]).slice(0,5).map(p=>`<div class="proc"><span>${esc(p.name)}</span><span>${p.pct} %</span></div>`).join("");
+  const topram = (s.top_ram||[]).slice(0,5).map(p=>`<div class="proc"><span>${esc(p.name)}</span><span>${p.pct} %</span></div>`).join("");
+
+  const net = (s.net_down_kbps!=null) ? `↓ ${Math.round(s.net_down_kbps)} ko/s · ↑ ${Math.round(s.net_up_kbps)} ko/s` : "—";
+  const host = esc(h.host);
+  const cmd = (action,label,arg="")=>`<button class="btn sm cmdbtn" data-host="${host}" data-action="${action}" data-arg="${esc(arg)}">${label}</button>`;
+
+  return `<section class="card">
+    <div class="hosthead">
+      <b>${host}</b> ${badge}
+      <span class="spacer" style="flex:1"></span>
+      <span class="muted" style="font-size:12.5px">${esc(s.os||"")} · ${off?("vu "+since(h.seen)):("maj "+since(h.seen))}</span>
+    </div>
+    ${off?`<div class="banner" style="margin-top:10px">Pas de nouvelles depuis ${since(h.seen)}. Dernières valeurs connues ci-dessous.</div>`:""}
+    <div class="gauges">${gauges.join("")}</div>
+    ${spark?`<div style="margin-top:6px"><div class="muted" style="font-size:12px">Processeur (dernière heure)</div>${spark}</div>`:""}
+    <div class="kv">
+      <div>Allumé depuis</div><div>${fmtDur(s.uptime_s)}</div>
+      <div>Réseau</div><div>${net}</div>
+      ${s.load1!=null?`<div>Charge</div><div>${s.load1} · ${s.load5} · ${s.load15}</div>`:""}
+      <div>Disque</div><div>${s.disk_used!=null?fmtBytes(s.disk_used)+" / "+fmtBytes(s.disk_total):"—"}</div>
+    </div>
+    ${watched?`<div class="chips">${watched}</div>`:""}
+    ${(topcpu||topram)?`<details><summary>Applications les plus gourmandes</summary>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px">
+        <div><div class="muted" style="font-size:12px;margin-bottom:4px">Processeur</div>${topcpu||'<div class="muted">—</div>'}</div>
+        <div><div class="muted" style="font-size:12px;margin-bottom:4px">Mémoire</div>${topram||'<div class="muted">—</div>'}</div>
+      </div></details>`:""}
+    <div class="cmds">
+      ${cmd("ping","🔔 Faire sonner")}
+      ${cmd("notify","💬 Message")}
+      ${cmd("refresh","🔄 Rafraîchir")}
+    </div>
+  </section>`;
+}
+
+async function onCommand(e){
+  const b = e.currentTarget, action=b.dataset.action, host=b.dataset.host;
+  let arg = b.dataset.arg||"";
+  if(action==="notify"){ arg = prompt("Message à afficher sur l'ordinateur :",""); if(arg===null) return; }
+  b.disabled=true;
+  const {data,status} = await api("/api/command/add",{method:"POST",body:{host,action,arg}});
+  b.disabled=false;
+  toast(status===200?"Commande envoyée ✓ (prise en compte sous ~20 s)":("Échec : "+(data.error||status)));
+}
+
+/* ---------- Rafraîchissement ---------- */
+let timer=null;
+async function refresh(){
+  try{
+    const {data,status} = await api("/api/status/get");
+    if(status===200){ $("#codeBanner").hidden=true; render(data); }
+  }catch(e){ /* hors ligne : on garde l'affichage précédent */ }
+}
+function schedule(){
+  if(timer) clearInterval(timer);
+  const ms = parseInt(store.poll||"10000",10);
+  if(ms>0) timer=setInterval(()=>{ if(!document.hidden) refresh(); }, ms);
+}
+
+/* ---------- Notifications Web Push ---------- */
+function b64ToU8(base64){
+  const pad="=".repeat((4-base64.length%4)%4);
+  const b=(base64+pad).replace(/-/g,"+").replace(/_/g,"/");
+  const raw=atob(b); const out=new Uint8Array(raw.length);
+  for(let i=0;i<raw.length;i++) out[i]=raw.charCodeAt(i);
+  return out;
+}
+let swReg=null;
+async function initSW(){
+  if(!("serviceWorker" in navigator)) return;
+  try{ swReg = await navigator.serviceWorker.register("/sw.js"); }catch(e){}
+  await refreshNotifState();
+}
+async function refreshNotifState(){
+  const card=$("#notifState"), btn=$("#notifBtn"), test=$("#testBtn");
+  if(!("Notification" in window) || !("serviceWorker" in navigator)){
+    card.textContent="Ce navigateur ne gère pas les notifications. Sur iPhone : ouvre ce site dans Safari, « Partager » → « Sur l'écran d'accueil », puis rouvre-le depuis l'icône.";
+    btn.hidden=true; return;
+  }
+  let sub=null; try{ sub = swReg && await swReg.pushManager.getSubscription(); }catch{}
+  if(Notification.permission==="granted" && sub){
+    card.textContent="✅ Notifications activées sur ce téléphone."; btn.hidden=true; test.hidden=false;
+  }else{
+    card.textContent="Reçois une alerte quand ton ordinateur a un souci, s'éteint ou revient en ligne.";
+    btn.hidden=false; test.hidden=true;
+  }
+}
+async function enableNotifs(){
+  if(!swReg){ toast("Service worker pas prêt, réessaie."); return; }
+  const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+  const perm = await Notification.requestPermission();
+  if(perm!=="granted"){
+    toast("Notifications refusées.");
+    if(!standalone) toast("Sur iPhone, installe d'abord le site sur l'écran d'accueil.");
+    return;
+  }
+  const {data} = await api("/api/push/vapid-key");
+  if(!data.key){ toast("Web Push non configuré sur le site (clés VAPID)."); return; }
+  try{
+    const sub = await swReg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:b64ToU8(data.key)});
+    const r = await api("/api/push/subscribe",{method:"POST",body:{subscription:sub}});
+    if(r.status===200){ toast("Notifications activées ✓"); } else { toast("Échec de l'abonnement."); }
+  }catch(e){ toast("Impossible d'activer : "+e.message); }
+  refreshNotifState();
+}
+async function disableNotifs(){
+  try{
+    const sub = swReg && await swReg.pushManager.getSubscription();
+    if(sub){ await api("/api/push/unsubscribe",{method:"POST",body:{endpoint:sub.endpoint}}); await sub.unsubscribe(); }
+    toast("Notifications désactivées.");
+  }catch(e){}
+  refreshNotifState();
+}
+
+/* ---------- Toast ---------- */
+let toastT=null;
+function toast(msg){
+  const t=$("#toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"), 2600);
+}
+
+/* ---------- Réglages (sheet) ---------- */
+function openSheet(){
+  $("#codeInput").value=store.code; $("#themeSel").value=store.theme; $("#pollSel").value=store.poll;
+  $("#sheet").classList.add("show");
+}
+function closeSheet(){ $("#sheet").classList.remove("show"); }
+
+/* ---------- Événements ---------- */
+$("#refreshBtn").addEventListener("click", ()=>{ refresh(); toast("Actualisé"); });
+$("#settingsBtn").addEventListener("click", openSheet);
+$("#closeSheet").addEventListener("click", closeSheet);
+$("#sheet").addEventListener("click", e=>{ if(e.target.id==="sheet") closeSheet(); });
+$("#saveSettings").addEventListener("click", ()=>{
+  store.code=$("#codeInput").value.trim(); store.theme=$("#themeSel").value; store.poll=$("#pollSel").value;
+  applyTheme(); schedule(); closeSheet(); refresh(); toast("Réglages enregistrés");
+});
+$("#unsubBtn").addEventListener("click", disableNotifs);
+$("#notifBtn").addEventListener("click", enableNotifs);
+$("#testBtn").addEventListener("click", async ()=>{
+  const {data,status}=await api("/api/push/test",{method:"POST"});
+  toast(status===200&&data.ok?`Test envoyé à ${data.sent||0} appareil(s)`:(data.error||"Échec du test"));
+});
+$("#clearAlerts").addEventListener("click", async ()=>{
+  if(!confirm("Effacer toutes les alertes affichées ?")) return;
+  await api("/api/alerts/clear",{method:"POST"}); refresh();
+});
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) refresh(); });
+
+/* ---------- Démarrage ---------- */
+$("#themeSel") && ($("#themeSel").value=store.theme);
+initSW();
+refresh();
+schedule();
+</script>
+</body>
+</html>

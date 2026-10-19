@@ -1,0 +1,15 @@
+# Dépendances Node des fonctions Netlify (réinstallées avec « npm install »)
+node_modules/
+netlify/functions/node_modules/
+
+# Agent : environnement Python isolé + configuration perso (contient le secret) + événements
+agent/.venv/
+agent/config.json
+agent/events.ndjson
+__pycache__/
+*.pyc
+
+# Divers
+.DS_Store
+.netlify/
+*.log

@@ -1,0 +1,9 @@
+{
+  "name": "vigie-pc-functions",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Fonctions Netlify de Vigie PC : état des ordinateurs (Upstash Redis) + notifications Web Push + chien de garde hors ligne.",
+  "dependencies": {
+    "web-push": "^3.6.7"
+  }
+}

@@ -1,0 +1,52 @@
+# Vigie PC — configuration Netlify.
+# Sert le site (dossier web/) + les fonctions serverless (netlify/functions/) qui stockent
+# l'état du ou des ordinateurs et relaient les notifications push vers le téléphone.
+# Variables d'environnement à définir dans Netlify (Site settings > Environment variables) :
+#   UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN   (base partagée gratuite Upstash)
+#   VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT  (notifications Web Push)
+#   VIGIE_ACCESS_CODE     code d'accès au tableau de bord (saisi une fois dans le site)
+#   VIGIE_SHARED_SECRET   secret connu seulement de l'agent qui tourne sur l'ordinateur
+# Voir le README (section « Mise en place »).
+
+[build]
+  publish = "web"
+  functions = "netlify/functions"
+
+# Le chien de garde « hors ligne » : vérifie chaque minute si un ordinateur n'a plus donné
+# signe de vie et envoie une notification « hors ligne » si besoin (fonction planifiée Netlify).
+[functions."watchdog"]
+  schedule = "* * * * *"
+
+# Adresses lisibles utilisées par le site et par l'agent (au lieu de /.netlify/functions/<nom>).
+[[redirects]]
+  from = "/api/status/ingest"
+  to = "/.netlify/functions/status-ingest"
+  status = 200
+[[redirects]]
+  from = "/api/status/get"
+  to = "/.netlify/functions/status-get"
+  status = 200
+[[redirects]]
+  from = "/api/alerts/clear"
+  to = "/.netlify/functions/alerts-clear"
+  status = 200
+[[redirects]]
+  from = "/api/command/add"
+  to = "/.netlify/functions/command-add"
+  status = 200
+[[redirects]]
+  from = "/api/push/subscribe"
+  to = "/.netlify/functions/push-subscribe"
+  status = 200
+[[redirects]]
+  from = "/api/push/unsubscribe"
+  to = "/.netlify/functions/push-unsubscribe"
+  status = 200
+[[redirects]]
+  from = "/api/push/vapid-key"
+  to = "/.netlify/functions/push-vapid-key"
+  status = 200
+[[redirects]]
+  from = "/api/push/test"
+  to = "/.netlify/functions/push-test"
+  status = 200

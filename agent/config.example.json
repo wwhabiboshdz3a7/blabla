@@ -1,0 +1,24 @@
+{
+  "_lisez_moi": "Copie ce fichier en « config.json » (dans le même dossier) et remplis au moins site_url et shared_secret. Le reste a des valeurs par défaut raisonnables.",
+
+  "site_url": "https://ton-site.netlify.app",
+  "shared_secret": "colle-ici-le-meme-secret-que-VIGIE_SHARED_SECRET-sur-netlify",
+
+  "host_name": "",
+  "interval_s": 20,
+
+  "thresholds": {
+    "cpu_pct": 90,
+    "ram_pct": 90,
+    "disk_pct": 92,
+    "battery_pct": 15,
+    "sustain_cycles": 3
+  },
+
+  "watch_processes": [],
+
+  "allow_commands": ["ping", "notify", "refresh"],
+
+  "events_file": "events.ndjson",
+  "quiet": false
+}
