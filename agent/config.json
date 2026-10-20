@@ -1,0 +1,22 @@
+{
+  "_lisez_moi": "Configuration de l'agent. Remplace site_url par l'adresse de ton site Netlify. shared_secret doit être identique à VIGIE_SHARED_SECRET sur Netlify.",
+  "site_url": "https://ton-site.netlify.app",
+  "shared_secret": "sagrossetetedegolmon",
+  "host_name": "",
+  "interval_s": 20,
+  "thresholds": {
+    "cpu_pct": 90,
+    "ram_pct": 90,
+    "disk_pct": 92,
+    "battery_pct": 15,
+    "sustain_cycles": 3
+  },
+  "watch_processes": [],
+  "allow_commands": [
+    "ping",
+    "notify",
+    "refresh"
+  ],
+  "events_file": "events.ndjson",
+  "quiet": false
+}

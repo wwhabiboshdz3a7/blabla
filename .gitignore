@@ -4,7 +4,7 @@ netlify/functions/node_modules/
 
 # Agent : environnement Python isolé + configuration perso (contient le secret) + événements
 agent/.venv/
-agent/config.json
+# agent/config.json est versionné volontairement (contient le secret de l agent)
 agent/events.ndjson
 __pycache__/
 *.pyc
