@@ -58,7 +58,7 @@ header{display:flex;align-items:center;gap:12px;padding:14px 0 8px;position:stic
 .card h2{font-size:15px;letter-spacing:.2px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .row{display:flex;align-items:center;gap:10px}
 .btn{border:1px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:12px;
-  padding:11px 14px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+  padding:11px 14px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px;justify-content:center;text-decoration:none}
 .btn:active{transform:scale(.98)}
 .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
 .btn.ghost{background:transparent}
@@ -138,10 +138,17 @@ details[open]>summary::before{content:"▾ ";}
 
   <section class="card" id="notifCard">
     <h2>🔔 Notifications sur ce téléphone</h2>
-    <p class="muted" id="notifState" style="margin:0 0 12px">Reçois une alerte quand ton ordinateur a un souci, s'éteint ou revient en ligne.</p>
+    <p class="muted" style="margin:0 0 10px">Reçois une alerte quand ton ordinateur a un souci, s'éteint ou revient en ligne, via l'appli gratuite <b>ntfy</b>.</p>
+    <ol class="muted" style="margin:0 0 12px;padding-left:20px;line-height:1.6">
+      <li>Installe <b>ntfy</b> : <a href="https://apps.apple.com/app/ntfy/id1625396347" target="_blank" rel="noopener">iPhone</a> · <a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener">Android</a></li>
+      <li>Appuie sur « S'abonner dans ntfy » — ou dans l'appli, <b>+</b> puis colle ce canal :<br>
+        <code id="ntfyTopic" style="user-select:all;word-break:break-all">…</code></li>
+      <li>Appuie sur « Tester » : la notification doit arriver.</li>
+    </ol>
     <div class="row" style="flex-wrap:wrap">
-      <button class="btn primary" id="notifBtn">Activer les notifications</button>
-      <button class="btn ghost sm" id="testBtn" hidden>Tester</button>
+      <a class="btn primary" id="notifBtn" href="#">S'abonner dans ntfy</a>
+      <button class="btn ghost sm" id="copyTopic">Copier le canal</button>
+      <button class="btn ghost sm" id="testBtn">Tester</button>
     </div>
   </section>
 
@@ -187,7 +194,7 @@ details[open]>summary::before{content:"▾ ";}
     </div>
     <div class="row" style="margin-top:8px;flex-wrap:wrap">
       <button class="btn" id="saveSettings">Enregistrer</button>
-      <button class="btn ghost sm" id="unsubBtn">Désactiver les notifications</button>
+      <button class="btn ghost sm" id="unsubBtn">Changer de canal ntfy</button>
     </div>
   </div>
 </div>
@@ -374,59 +381,33 @@ function schedule(){
   if(ms>0) timer=setInterval(()=>{ if(!document.hidden) refresh(); }, ms);
 }
 
-/* ---------- Notifications Web Push ---------- */
-function b64ToU8(base64){
-  const pad="=".repeat((4-base64.length%4)%4);
-  const b=(base64+pad).replace(/-/g,"+").replace(/_/g,"/");
-  const raw=atob(b); const out=new Uint8Array(raw.length);
-  for(let i=0;i<raw.length;i++) out[i]=raw.charCodeAt(i);
-  return out;
+/* ---------- Notifications (appli ntfy) ---------- */
+let ntfy=null;
+async function loadNtfy(){
+  const {data,status} = await api("/api/push/ntfy");
+  if(status!==200 || !data.topic){ $("#ntfyTopic").textContent = data.error || "indisponible"; return; }
+  ntfy=data; showNtfy();
 }
-let swReg=null;
-async function initSW(){
-  if(!("serviceWorker" in navigator)) return;
-  try{ swReg = await navigator.serviceWorker.register("/sw.js"); }catch(e){}
-  await refreshNotifState();
+function showNtfy(){
+  $("#ntfyTopic").textContent = ntfy.server==="https://ntfy.sh" ? ntfy.topic : ntfy.url;
+  // Sur téléphone, le lien ntfy:// ouvre directement l'appli sur le bon canal.
+  $("#notifBtn").href = /android|iphone|ipad/i.test(navigator.userAgent) ? ntfy.app : ntfy.url;
 }
-async function refreshNotifState(){
-  const card=$("#notifState"), btn=$("#notifBtn"), test=$("#testBtn");
-  if(!("Notification" in window) || !("serviceWorker" in navigator)){
-    card.textContent="Ce navigateur ne gère pas les notifications. Sur iPhone : ouvre ce site dans Safari, « Partager » → « Sur l'écran d'accueil », puis rouvre-le depuis l'icône.";
-    btn.hidden=true; return;
-  }
-  let sub=null; try{ sub = swReg && await swReg.pushManager.getSubscription(); }catch{}
-  if(Notification.permission==="granted" && sub){
-    card.textContent="✅ Notifications activées sur ce téléphone."; btn.hidden=true; test.hidden=false;
-  }else{
-    card.textContent="Reçois une alerte quand ton ordinateur a un souci, s'éteint ou revient en ligne.";
-    btn.hidden=false; test.hidden=true;
-  }
+async function copyTopic(){
+  if(!ntfy) return;
+  try{ await navigator.clipboard.writeText(ntfy.topic); toast("Canal copié"); }
+  catch{ prompt("Copie ce canal :", ntfy.topic); }
 }
-async function enableNotifs(){
-  if(!swReg){ toast("Service worker pas prêt, réessaie."); return; }
-  const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
-  const perm = await Notification.requestPermission();
-  if(perm!=="granted"){
-    toast("Notifications refusées.");
-    if(!standalone) toast("Sur iPhone, installe d'abord le site sur l'écran d'accueil.");
-    return;
-  }
-  const {data} = await api("/api/push/vapid-key");
-  if(!data.key){ toast("Web Push non configuré sur le site (clés VAPID)."); return; }
-  try{
-    const sub = await swReg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:b64ToU8(data.key)});
-    const r = await api("/api/push/subscribe",{method:"POST",body:{subscription:sub}});
-    if(r.status===200){ toast("Notifications activées ✓"); } else { toast("Échec de l'abonnement."); }
-  }catch(e){ toast("Impossible d'activer : "+e.message); }
-  refreshNotifState();
+async function resetNtfy(){
+  if(!confirm("Créer un nouveau canal ? L'ancien ne recevra plus rien : il faudra se réabonner dans ntfy.")) return;
+  const {data,status} = await api("/api/push/ntfy",{method:"POST",body:{reset:true}});
+  if(status!==200){ toast(data.error||"Échec"); return; }
+  ntfy=data; showNtfy(); closeSheet();
+  toast(data.fixed?"Canal imposé par NTFY_TOPIC sur Netlify":"Nouveau canal créé — réabonne-toi dans ntfy");
 }
-async function disableNotifs(){
-  try{
-    const sub = swReg && await swReg.pushManager.getSubscription();
-    if(sub){ await api("/api/push/unsubscribe",{method:"POST",body:{endpoint:sub.endpoint}}); await sub.unsubscribe(); }
-    toast("Notifications désactivées.");
-  }catch(e){}
-  refreshNotifState();
+function initSW(){
+  // Service worker gardé pour pouvoir installer le site sur l'écran d'accueil (PWA).
+  if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(()=>{});
 }
 
 /* ---------- Toast ---------- */
@@ -450,13 +431,13 @@ $("#closeSheet").addEventListener("click", closeSheet);
 $("#sheet").addEventListener("click", e=>{ if(e.target.id==="sheet") closeSheet(); });
 $("#saveSettings").addEventListener("click", ()=>{
   store.code=$("#codeInput").value.trim(); store.theme=$("#themeSel").value; store.poll=$("#pollSel").value;
-  applyTheme(); schedule(); closeSheet(); refresh(); toast("Réglages enregistrés");
+  applyTheme(); schedule(); closeSheet(); refresh(); loadNtfy(); toast("Réglages enregistrés");
 });
-$("#unsubBtn").addEventListener("click", disableNotifs);
-$("#notifBtn").addEventListener("click", enableNotifs);
+$("#unsubBtn").addEventListener("click", resetNtfy);
+$("#copyTopic").addEventListener("click", copyTopic);
 $("#testBtn").addEventListener("click", async ()=>{
   const {data,status}=await api("/api/push/test",{method:"POST"});
-  toast(status===200&&data.ok?`Test envoyé à ${data.sent||0} appareil(s)`:(data.error||"Échec du test"));
+  toast(status===200&&data.ok?"Test envoyé — regarde l'appli ntfy":(data.error||"Échec du test"));
 });
 $("#clearAlerts").addEventListener("click", async ()=>{
   if(!confirm("Effacer toutes les alertes affichées ?")) return;
@@ -467,6 +448,7 @@ document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) refresh
 /* ---------- Démarrage ---------- */
 $("#themeSel") && ($("#themeSel").value=store.theme);
 initSW();
+loadNtfy();
 refresh();
 schedule();
 </script>

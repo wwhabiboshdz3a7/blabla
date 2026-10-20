@@ -19,7 +19,8 @@ rafraîchir** (et le verrouiller / mettre en veille si tu l'autorises).
  └───────────────┘   commandes     └──────────────────────────────┘   consultation └──────────────┘
 ```
 
-Tout repose sur des **offres gratuites** (Netlify + Upstash) et ne demande aucun serveur à gérer.
+Tout repose sur des **offres gratuites** (Netlify + Upstash + l'appli ntfy) et ne demande aucun serveur à gérer.
+Les notifications passent par **[ntfy](https://ntfy.sh)** : aucune clé à générer, rien à installer côté site.
 
 ---
 
@@ -33,7 +34,6 @@ Tout repose sur des **offres gratuites** (Netlify + Upstash) et ne demande aucun
 | `web/` | Le site / tableau de bord (PWA installable sur le téléphone). |
 | `netlify/functions/` | Les fonctions serverless (état, notifications, file de commandes, chien de garde). |
 | `netlify.toml` | Configuration Netlify (sert `web/` + les fonctions + la planification du chien de garde). |
-| `scripts/generate-vapid.js` | Génère les clés de notification (une fois). |
 
 ---
 
@@ -47,14 +47,7 @@ Il y a trois morceaux : **le site** (dans le cloud), **l'agent** (sur l'ordinate
    <https://console.upstash.com>, puis *Redis → Create database*. Dans l'onglet *REST API*,
    note `UPSTASH_REDIS_REST_URL` et `UPSTASH_REDIS_REST_TOKEN`.
 
-2. **Clés de notification (VAPID)** — dans un terminal, depuis ce dossier :
-   ```
-   cd netlify/functions && npm install
-   node ../../scripts/generate-vapid.js
-   ```
-   Note les trois lignes affichées (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`).
-
-3. **Déploie sur Netlify (gratuit)** — crée un compte sur <https://netlify.com>, installe
+2. **Déploie sur Netlify (gratuit)** — crée un compte sur <https://netlify.com>, installe
    l'outil une fois (`npm install -g netlify-cli`), puis depuis ce dossier :
    ```
    netlify login
@@ -64,20 +57,21 @@ Il y a trois morceaux : **le site** (dans le cloud), **l'agent** (sur l'ordinate
    écrits dans `netlify.toml`). Note l'adresse obtenue, par ex. `https://vigie-daniel.netlify.app`.
    *(Tu peux aussi connecter un dépôt Git à Netlify au lieu de la ligne de commande.)*
 
-4. **Variables d'environnement** — dans Netlify, *Site settings → Environment variables*,
+3. **Variables d'environnement** — dans Netlify, *Site settings → Environment variables*,
    ajoute :
 
    | Variable | Valeur |
    |---|---|
    | `UPSTASH_REDIS_REST_URL` | (étape 1) |
    | `UPSTASH_REDIS_REST_TOKEN` | (étape 1) |
-   | `VAPID_PUBLIC_KEY` | (étape 2) |
-   | `VAPID_PRIVATE_KEY` | (étape 2) |
-   | `VAPID_SUBJECT` | `mailto:ton-email@exemple.com` |
    | `VIGIE_ACCESS_CODE` | un **code d'accès** que tu choisis (protège le site) |
    | `VIGIE_SHARED_SECRET` | un **secret** que tu choisis (connu seulement de l'agent) |
 
    Puis redéploie (`netlify deploy --prod`) pour que les variables soient prises en compte.
+
+   *Facultatif* : `NTFY_TOPIC` pour imposer toi-même le nom du canal de notifications (sinon un
+   nom aléatoire est créé tout seul et gardé dans Upstash), `NTFY_SERVER` pour utiliser ton
+   propre serveur ntfy au lieu de `https://ntfy.sh`.
 
 ### 2) L'agent (sur l'ordinateur à surveiller)
 
@@ -102,11 +96,13 @@ Il y a trois morceaux : **le site** (dans le cloud), **l'agent** (sur l'ordinate
 
 1. Ouvre l'adresse du site (`https://vigie-daniel.netlify.app`) dans le navigateur.
 2. Ouvre les **Réglages** (roue dentée) et saisis le **code d'accès** (`VIGIE_ACCESS_CODE`).
-3. **iPhone — important** : pour recevoir les notifications, Apple impose d'installer le site
-   sur l'écran d'accueil. Dans Safari : bouton **Partager → Sur l'écran d'accueil**, puis
-   rouvre Vigie depuis l'icône. Appuie ensuite sur **« Activer les notifications »**, puis
-   **« Tester »** pour vérifier.
-   *(Sur Android, l'activation marche directement dans le navigateur ; l'installation reste conseillée.)*
+3. Installe l'appli gratuite **ntfy** ([iPhone](https://apps.apple.com/app/ntfy/id1625396347) ·
+   [Android](https://play.google.com/store/apps/details?id=io.heckel.ntfy)).
+4. Sur le site, carte **« Notifications »** : appuie sur **« S'abonner dans ntfy »** (ouvre l'appli
+   sur le bon canal), ou dans l'appli **+** puis colle le canal affiché (`vigie-…`).
+   Appuie ensuite sur **« Tester »** : la notification doit arriver.
+   *(Pas besoin d'installer le site sur l'écran d'accueil pour les notifications : c'est l'appli
+   ntfy qui les reçoit.)*
 
 C'est fait. Tu suis ton ordinateur depuis le téléphone, où que tu sois.
 
@@ -119,7 +115,7 @@ C'est fait. Tu suis ton ordinateur depuis le téléphone, où que tu sois.
   applications surveillées (🟢/🔴), et le détail des applications les plus gourmandes.
 - **Fil d'alertes** : l'historique des événements marquants, avec leur heure.
 - **Pilotage** : boutons **Faire sonner**, **Message**, **Rafraîchir** par ordinateur.
-- **Notifications push** sur le téléphone pour chaque alerte (et retour à la normale).
+- **Notifications** sur le téléphone (appli ntfy) pour chaque alerte (et retour à la normale).
 
 ### Quand reçois-tu une notification ?
 
@@ -205,7 +201,9 @@ L'agent n'exécute **que** les actions présentes dans cette liste : c'est lui q
   (pratique pour un premier test, **déconseillé** ensuite).
 - Les données (état de la machine, abonnements push) vivent dans **ta** base Upstash, et
   expirent toutes seules après quelques jours d'inactivité. Rien n'est partagé avec des tiers.
-- La **clé privée VAPID** reste uniquement dans Netlify (jamais dans le site ni l'agent).
+- Le **canal ntfy** est un nom aléatoire impossible à deviner, affiché seulement aux personnes
+  qui ont le code d'accès. Quiconque le connaît peut lire les notifications : s'il a fuité,
+  *Réglages → « Changer de canal ntfy »* en crée un nouveau (réabonne-toi ensuite dans l'appli).
 - **Coût** : nul en usage normal. Les offres gratuites de Netlify et Upstash suffisent
   largement pour quelques ordinateurs qui envoient leur état toutes les 20 s.
 
@@ -215,10 +213,10 @@ L'agent n'exécute **que** les actions présentes dans cette liste : c'est lui q
 
 - *« secret invalide » / 401 côté agent* → `shared_secret` (config) ≠ `VIGIE_SHARED_SECRET` (Netlify).
 - *« code d'accès requis » sur le téléphone* → saisis le code dans Réglages.
-- *Pas de notification sur iPhone* → le site doit être **installé sur l'écran d'accueil** et
-  rouvert depuis son icône avant d'activer les notifications (exigence d'Apple).
-- *« Web Push non configuré »* → les variables `VAPID_*` manquent dans Netlify (ou pas de
-  redéploiement après les avoir ajoutées).
+- *Pas de notification* → vérifie dans l'appli ntfy que tu es abonné au **même canal** que
+  celui affiché sur le site, et que les notifications de l'appli ntfy sont autorisées dans les
+  réglages du téléphone. Le bouton « Tester » du site doit faire arriver un message.
+- *Le canal affiche une erreur* → les variables `UPSTASH_*` manquent ou sont fausses dans Netlify.
 - *Mesures pauvres (CPU/applis manquants)* → `psutil` n'a pas pu s'installer ; relance le
   lanceur, ou installe-le à la main (`pip install psutil`). L'agent fonctionne quand même.
 - *L'ordinateur reste « hors ligne »* → l'agent n'est pas lancé, ou `site_url` est erroné.

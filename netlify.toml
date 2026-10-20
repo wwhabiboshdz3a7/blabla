@@ -3,7 +3,7 @@
 # l'état du ou des ordinateurs et relaient les notifications push vers le téléphone.
 # Variables d'environnement à définir dans Netlify (Site settings > Environment variables) :
 #   UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN   (base partagée gratuite Upstash)
-#   VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT  (notifications Web Push)
+#   NTFY_TOPIC, NTFY_SERVER  (facultatifs : notifications via l'appli ntfy, canal créé tout seul)
 #   VIGIE_ACCESS_CODE     code d'accès au tableau de bord (saisi une fois dans le site)
 #   VIGIE_SHARED_SECRET   secret connu seulement de l'agent qui tourne sur l'ordinateur
 # Voir le README (section « Mise en place »).
@@ -35,16 +35,8 @@
   to = "/.netlify/functions/command-add"
   status = 200
 [[redirects]]
-  from = "/api/push/subscribe"
-  to = "/.netlify/functions/push-subscribe"
-  status = 200
-[[redirects]]
-  from = "/api/push/unsubscribe"
-  to = "/.netlify/functions/push-unsubscribe"
-  status = 200
-[[redirects]]
-  from = "/api/push/vapid-key"
-  to = "/.netlify/functions/push-vapid-key"
+  from = "/api/push/ntfy"
+  to = "/.netlify/functions/push-ntfy"
   status = 200
 [[redirects]]
   from = "/api/push/test"
