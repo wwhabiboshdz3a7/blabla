@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d0f17">
+  <title>GrabDrop</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a href="./" class="brand">✊ GrabDrop <span>→ 🖐</span></a>
+  </header>
+
+  <!-- Accueil -->
+  <main id="home" class="screen">
+    <h1>Attrape tes photos sur le téléphone,<br>lâche-les sur le PC.</h1>
+    <p class="lead">Ferme la main devant la caméra du téléphone pour « attraper » les photos, puis ouvre-la pour les envoyer au PC.</p>
+    <div class="choices">
+      <button class="choice" id="btn-pc">
+        <span class="big">💻</span>
+        <strong>Mode PC</strong>
+        <small>Recevoir les photos</small>
+      </button>
+      <button class="choice" id="btn-phone">
+        <span class="big">📱</span>
+        <strong>Mode téléphone</strong>
+        <small>Choisir et envoyer des photos</small>
+      </button>
+    </div>
+    <ol class="howto">
+      <li>Ouvre ce site sur le PC et choisis <b>Mode PC</b>.</li>
+      <li>Sur le téléphone, scanne le QR code (ou tape le code).</li>
+      <li>Choisis tes photos, active la caméra.</li>
+      <li><b>✊ Ferme la main</b> devant le téléphone → photos attrapées.</li>
+      <li>Pointe vers le PC et <b>🖐 ouvre la main</b> → photos envoyées !</li>
+    </ol>
+  </main>
+
+  <!-- PC -->
+  <main id="pc" class="screen" hidden>
+    <section class="panel pair">
+      <h2>Connecter le téléphone</h2>
+      <div id="pc-qr" class="qr"></div>
+      <p class="code-label">Code</p>
+      <p id="pc-code" class="code">······</p>
+      <p class="muted small" id="pc-link"></p>
+      <p id="pc-status" class="status">Connexion au serveur…</p>
+    </section>
+
+    <section class="panel cam">
+      <h2>Webcam du PC <span class="muted small">(optionnel)</span></h2>
+      <p class="muted small">Active-la pour lâcher les photos en ouvrant la main <b>vers l'écran du PC</b>. Sinon, ouvre la main devant le téléphone.</p>
+      <div class="video-wrap" id="pc-video-wrap" hidden>
+        <video id="pc-video" playsinline muted class="mirror"></video>
+        <span class="gesture-badge" id="pc-gesture">—</span>
+      </div>
+      <button id="pc-cam-btn" class="btn">Activer la webcam</button>
+    </section>
+
+    <section class="panel drop">
+      <div class="drop-head">
+        <h2>Photos reçues <span id="pc-count" class="pill">0</span></h2>
+        <button id="pc-dl-all" class="btn ghost" disabled>Tout télécharger</button>
+      </div>
+      <div id="pc-holding" class="holding" hidden>
+        <div class="holding-thumbs" id="pc-holding-thumbs"></div>
+        <p id="pc-holding-text">✊ Photos attrapées…</p>
+      </div>
+      <div id="pc-gallery" class="gallery">
+        <p class="empty">Les photos apparaîtront ici.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Téléphone -->
+  <main id="phone" class="screen" hidden>
+    <section class="panel" id="ph-connect">
+      <h2>1. Connexion au PC</h2>
+      <form id="ph-form" class="row">
+        <input id="ph-code" maxlength="6" autocomplete="off" autocapitalize="characters" placeholder="CODE" inputmode="text">
+        <button class="btn" type="submit">Connecter</button>
+      </form>
+      <p id="ph-status" class="status">Entre le code affiché sur le PC (ou scanne son QR code).</p>
+    </section>
+
+    <section class="panel">
+      <h2>2. Photos</h2>
+      <label class="btn file-btn">
+        Choisir des photos
+        <input id="ph-files" type="file" accept="image/*" multiple hidden>
+      </label>
+      <div id="ph-thumbs" class="thumbs"></div>
+    </section>
+
+    <section class="panel">
+      <h2>3. Geste</h2>
+      <div class="video-wrap" id="ph-video-wrap" hidden>
+        <video id="ph-video" playsinline muted class="mirror"></video>
+        <span class="gesture-badge" id="ph-gesture">—</span>
+      </div>
+      <p id="ph-state" class="state">Active la caméra pour commencer.</p>
+      <div class="row">
+        <button id="ph-cam-btn" class="btn">Activer la caméra</button>
+        <button id="ph-flip-btn" class="btn ghost" hidden>↺ Caméra</button>
+      </div>
+      <button id="ph-send-btn" class="btn ghost full" disabled>Envoyer sans geste</button>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+</body>
+</html>
